@@ -1,12 +1,13 @@
-import { PeerClient, Connection } from './peer/peer-client';
+import { ACTION_HOST } from './peer/host-actions';
 import { Component } from '@angular/core';
-import { MESSAGE } from './peer/peer-actions';
+import { Client } from './peer/client';
+import { Host } from './peer/host';
 
 
 @Component({
   selector: 'app-root',
   template: `
-    <p>My id : {{client.getId()}}</p>
+    <p>My id : {{client?.getId()}}</p>
     <div>
       <label>Connect :</label>
       <input [(ngModel)]="connectId">
@@ -14,14 +15,15 @@ import { MESSAGE } from './peer/peer-actions';
     <button (click)="connect()">Connect</button>
     <button (click)="disconnect()">Disconnect</button>
 
-    <br>
-    <button (click)="sendDate()">Send date</button>
+    <p>Ping up{{client?.getHeartbeat()?.pingToHost()}}</p>
+    <p>Ping down{{client?.getHeartbeat()?.pingToClient()}}</p>
 
+    <br>
+    <input [(ngModel)]="inputChat"><button (click)="sendChat()">OK</button>
 
     <br>
     <p>Connections</p>
     <ul>
-      <li *ngFor="let c of getConnections()">[{{c.lastPing.fromClient}}, {{c.lastPing.toClient}}]{{c.id}}</li>
     </ul>
     <router-outlet></router-outlet>
   `,
@@ -29,26 +31,24 @@ import { MESSAGE } from './peer/peer-actions';
 })
 export class AppComponent {
   connectId = '';
-  client: PeerClient;
+  host: Host;
+  client: Client;
+
+  inputChat = '';
 
   constructor() {
-    this.client = new PeerClient();
-    console.log(this.client)
+    this.host = new Host();
+    this.client = new Client();
     // const a = new Peer();
   }
 
-  getConnections(): Connection[] {
-    return Array.from(this.client.getConnections().values());
-  }
-
-  sendDate() {
-    // this.client.send(new Date().getTime());
+  sendChat() {
     this.client.send({
-      type: MESSAGE.PING,
-      data: new Date().getTime()
-    });
+      action: ACTION_HOST.CHAT,
+      data: this.inputChat
+    })
+    this.inputChat = '';
   }
-
   connect() {
     this.client.connect(this.connectId);
   }
