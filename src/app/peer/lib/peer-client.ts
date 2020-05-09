@@ -37,9 +37,11 @@ export abstract class PeerClient<ACTION_CLIENT, ACTION_HOST> extends Connection<
     if (this.connection.peer !== id) throw Error('Connected to wrong id')
     await sleep(1000)
     this.send(new MessageTimestamps())
+    this.onConnected();
   }
 
   async abstract onMessage(message: Message<any, ACTION_CLIENT>): Promise<any>
+  async abstract onConnected(): Promise<any>
 
   public async disconnect() {
     // TODO

@@ -1,3 +1,4 @@
 export enum ACTION_CLIENT {
   CHAT = 'CHAT',
+  PLAYERS_LIST = 'PLAYERS_LIST'
 }

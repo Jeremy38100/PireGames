@@ -59,7 +59,7 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
         return
       }
       console.log('onData', message)
-      this.onMessage(message)
+      this.onMessage(id, message)
     });
     connection.on('open', () => console.log('open'));
     connection.on('close', () => console.log('close'));
@@ -72,13 +72,13 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
     this.clients.delete(id)
   }
 
-  protected abstract async onMessage(message: Message<any, ACTION_HOST>);
+  protected abstract async onMessage(id: string, message: Message<any, ACTION_HOST>): Promise<any>;
 
-  private sendClient(id: ClientId, message: Message<any, ACTION_CLIENT>) {
+  protected sendClient(id: ClientId, message: Message<any, ACTION_CLIENT>) {
     this.getPeer(id).send(message)
   }
 
-  private sendAll(message: Message<any, ACTION_CLIENT>) {
+  protected sendAll(message: Message<any, ACTION_CLIENT>) {
     this.getClientsId().forEach(id => this.sendClient(id, message))
   }
 }

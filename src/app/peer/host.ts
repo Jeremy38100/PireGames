@@ -1,14 +1,25 @@
 import { ACTION_CLIENT } from './client-actions';
-import { ACTION_HOST } from './host-actions';
-import { ACTION, Message } from './lib/message';
-import { PeerHost } from './lib/peer-host';
+import { ACTION_HOST, Player } from './host-actions';
+import { Message } from './lib/message';
+import { ClientId, PeerHost } from './lib/peer-host';
+import {mapToJson} from 'src/app/tools/map'
 
 export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
+
+  private players: Map<ClientId, Player> = new Map();
+
   constructor() {
     super()
   }
 
-  protected async onMessage(message: Message<any, ACTION_HOST>) {
-    console.log(message)
+  protected async onMessage(id: string, message: Message<any, ACTION_HOST>) {
+    console.log(id, message)
+    const {action, data} = message;
+    if (action === ACTION_HOST.SET_PLAYER) this.onSetPlayer(id, data)
+  }
+
+  onSetPlayer(id: string, player: Player) {
+    this.players.set(id, player)
+    this.sendAll({action: ACTION_CLIENT.PLAYERS_LIST, data: mapToJson(this.players)})
   }
 }
