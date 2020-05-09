@@ -1,3 +1,4 @@
+import { now } from 'src/app/tools/date';
 export enum ACTION {
   'HEARTBEAT',
   'BROADCAST',
@@ -45,5 +46,9 @@ export class Heartbeat {
     const {receiveAtClient, sendFromHost} = this.timestamps;
     if (!receiveAtClient || ! sendFromHost) return 0;
     return receiveAtClient - sendFromHost
+  }
+
+  getLastPingInMs(): number {
+    return now() - this.timestamps.receiveAtHost;
   }
 }

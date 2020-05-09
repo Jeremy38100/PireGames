@@ -18,8 +18,20 @@ export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
     if (action === ACTION_HOST.SET_PLAYER) this.onSetPlayer(id, data)
   }
 
-  onSetPlayer(id: string, player: Player) {
+  protected async updateClients() {
+    for (const id of this.players.keys()) {
+      if (!this.clients.get(id)) this.players.delete(id)
+    }
+    this.sendPlayers()
+  }
+
+  private onSetPlayer(id: string, player: Player) {
     this.players.set(id, player)
+    this.sendPlayers()
+  }
+
+  private sendPlayers() {
     this.sendAll({action: ACTION_CLIENT.PLAYERS_LIST, data: mapToJson(this.players)})
   }
+
 }

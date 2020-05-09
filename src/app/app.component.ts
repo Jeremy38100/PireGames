@@ -39,7 +39,6 @@ export class AppComponent {
   constructor() {
     this.host = new Host();
     this.client = new Client({pseudo: 'jeremy'});
-    // const a = new Peer();
   }
 
   sendChat() {

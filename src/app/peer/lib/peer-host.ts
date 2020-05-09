@@ -27,9 +27,9 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
   private peer: Peer;
   clients: Map<ClientId, Client<ACTION_CLIENT>> = new Map()
 
-  constructor() {
+  constructor(private readonly heartbeatTimeout = 2000) {
     this.peer = new Peer();
-    this.peer.on('open', id => console.log('open', id));
+    this.peer.on('open', id => {console.log('open', id); this.startCleaner()});
     this.peer.on('connection', c => this.onConnection(c));
 
     this.peer.on('call', d => console.log('connection', d));
@@ -72,7 +72,28 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
     this.clients.delete(id)
   }
 
+  private startCleaner() {
+    setInterval(() => {
+      console.log('cleaner');
+      this.cleanClients()
+    }, this.heartbeatTimeout)
+  }
+
+  private cleanClients() {
+    let isUpdate = false;
+    for (const id of this.clients.keys()) {
+      const client = this.getPeer(id);
+      const heartbeat = client.getHeartbeat();
+      if (heartbeat.getLastPingInMs() > this.heartbeatTimeout * 1.2) {
+        this.clients.delete(id);
+        isUpdate = true;
+      }
+    }
+    if (isUpdate) this.updateClients();
+  }
+
   protected abstract async onMessage(id: string, message: Message<any, ACTION_HOST>): Promise<any>;
+  protected abstract async updateClients(): Promise<any>;
 
   protected sendClient(id: ClientId, message: Message<any, ACTION_CLIENT>) {
     this.getPeer(id).send(message)

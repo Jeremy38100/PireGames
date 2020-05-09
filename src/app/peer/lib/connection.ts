@@ -7,7 +7,7 @@ export abstract class Connection<ACTION_RECEIVE, ACTION_SEND> {
   protected heartbeat: Heartbeat
   protected connection: DataConnection;
 
-  constructor(private readonly isHost: boolean) { }
+  constructor(private readonly isHost: boolean, protected readonly heartbeatTimeout = 2000) { }
 
   public getHeartbeat(): Heartbeat { return this.heartbeat}
 
@@ -25,7 +25,7 @@ export abstract class Connection<ACTION_RECEIVE, ACTION_SEND> {
     } else {
       data.receiveAtClient = now()
       this.heartbeat = new Heartbeat({...data});
-      await sleep(5000);
+      await sleep(this.heartbeatTimeout);
       data.sendFromClient = now()
     }
     this.send({action: ACTION.HEARTBEAT, data});
