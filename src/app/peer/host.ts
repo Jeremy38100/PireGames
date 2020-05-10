@@ -1,8 +1,9 @@
+import { mapToJson } from 'src/app/tools/map';
 import { ACTION_CLIENT } from './client-actions';
 import { ACTION_HOST, Player } from './host-actions';
 import { Message } from './lib/message';
 import { ClientId, PeerHost } from './lib/peer-host';
-import {mapToJson} from 'src/app/tools/map'
+import { ChatMessage } from './client';
 
 export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
 
@@ -16,6 +17,14 @@ export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
     console.log(id, message)
     const {action, data} = message;
     if (action === ACTION_HOST.SET_PLAYER) this.onSetPlayer(id, data)
+    if (action === ACTION_HOST.CHAT) this.onChat(id, data)
+  }
+
+  private onChat(id: string, message: string) {
+    const pseudo = this.getPlayer(id)?.pseudo;
+    if (!pseudo) return
+    const data: ChatMessage = {pseudo, message}
+    this.sendAll({action: ACTION_CLIENT.CHAT, data})
   }
 
   protected async updateClients() {
@@ -32,6 +41,10 @@ export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
 
   private sendPlayers() {
     this.sendAll({action: ACTION_CLIENT.PLAYERS_LIST, data: mapToJson(this.players)})
+  }
+
+  private getPlayer(id: string): Player {
+    return this.players.get(id)
   }
 
 }

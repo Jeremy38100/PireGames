@@ -1,5 +1,5 @@
 import { ACTION_HOST } from './peer/host-actions';
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { Client } from './peer/client';
 import { Host } from './peer/host';
 
@@ -25,6 +25,11 @@ import { Host } from './peer/host';
     <ul>
       <li *ngFor="let playerKV of client?.getPlayers() | keyvalue">{{playerKV.key}} - {{playerKV.value.pseudo}}</li>
     </ul>
+    <br>
+    <p>Chat</p>
+    <p *ngFor="let chat of client.getChatMessages()">{{chat.pseudo}}: {{chat.message}}</p>
+    <paste-image (onPaste)="onImage($event)"></paste-image>
+    <img [src]="img" alt="Red dot" />
     <router-outlet></router-outlet>
   `,
   styles: []
@@ -33,12 +38,21 @@ export class AppComponent {
   connectId = '';
   host: Host;
   client: Client;
+  img = ''
 
   inputChat = '';
 
-  constructor() {
+  constructor(private zone: NgZone) {
     this.host = new Host();
-    this.client = new Client({pseudo: 'jeremy'});
+    this.client = new Client({pseudo: 'jeremy'}, zone);
+  }
+
+  onImage(image64: string) {
+    this.img = image64
+    this.client.send({
+      action:ACTION_HOST.CHAT,
+      data: image64
+    });
   }
 
   sendChat() {

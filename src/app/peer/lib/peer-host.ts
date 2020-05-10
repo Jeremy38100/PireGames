@@ -84,7 +84,7 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
     for (const id of this.clients.keys()) {
       const client = this.getPeer(id);
       const heartbeat = client.getHeartbeat();
-      if (heartbeat.getLastPingInMs() > this.heartbeatTimeout * 1.2) {
+      if (heartbeat?.getLastPingInMs() > this.heartbeatTimeout * 1.2) {
         this.clients.delete(id);
         isUpdate = true;
       }
