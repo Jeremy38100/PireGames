@@ -10,7 +10,11 @@ export abstract class PeerClient<ACTION_CLIENT, ACTION_HOST> extends Connection<
 
   constructor() {
     super(false)
-    this.peer = new Peer();
+    this.peer = new Peer({
+      host: 'localhost',
+      port: 9000,
+      path: '/myapp'
+    });
     this.peer.on('open', id => this.clientId = id)
   }
 

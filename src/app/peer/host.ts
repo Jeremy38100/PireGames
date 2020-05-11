@@ -3,7 +3,7 @@ import { ACTION_CLIENT } from './client-actions';
 import { ACTION_HOST, Player } from './host-actions';
 import { Message } from './lib/message';
 import { ClientId, PeerHost } from './lib/peer-host';
-import { ChatMessage } from './client';
+import { PeerChat } from './client';
 
 export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
 
@@ -20,10 +20,10 @@ export class Host extends PeerHost<ACTION_HOST, ACTION_CLIENT> {
     if (action === ACTION_HOST.CHAT) this.onChat(id, data)
   }
 
-  private onChat(id: string, message: string) {
-    const pseudo = this.getPlayer(id)?.pseudo;
-    if (!pseudo) return
-    const data: ChatMessage = {pseudo, message}
+  private onChat(senderId: string, message: string) {
+    const senderPseudo = this.getPlayer(senderId)?.pseudo;
+    if (!senderPseudo) return
+    const data: PeerChat = {senderId, senderPseudo, message}
     this.sendAll({action: ACTION_CLIENT.CHAT, data})
   }
 

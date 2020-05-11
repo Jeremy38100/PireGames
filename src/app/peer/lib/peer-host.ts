@@ -28,7 +28,11 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
   clients: Map<ClientId, Client<ACTION_CLIENT>> = new Map()
 
   constructor(private readonly heartbeatTimeout = 2000) {
-    this.peer = new Peer();
+    this.peer = new Peer(Math.random().toString(36).substr(2, 9), {
+      host: 'localhost',
+      port: 9000,
+      path: '/myapp'
+    });
     this.peer.on('open', id => {console.log('open', id); this.startCleaner()});
     this.peer.on('connection', c => this.onConnection(c));
 
@@ -36,6 +40,10 @@ export abstract class PeerHost<ACTION_HOST, ACTION_CLIENT> {
     this.peer.on('close', () => console.log('close'));
     this.peer.on('disconnected', () => console.log('disconnected'));
     this.peer.on('error', err => console.log('error', err));
+  }
+
+  getId(): string {
+    return this.peer.id
   }
 
   getClientsId(): ClientId[] {
