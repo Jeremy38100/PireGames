@@ -1,0 +1,46 @@
+// this is our just created themes.scss file, make sure the path to the file is correct
+@import 'themes';
+
+// framework component styles
+@import '~@nebular/theme/styles/globals';
+@import '~@nebular/bootstrap/styles/globals';
+
+// install the framework styles
+@include nb-install() {
+  @include nb-theme-global();
+  @include nb-bootstrap-global();
+};
+
+.m-r {
+  margin-right: 8px;
+}
+
+.m-l {
+  margin-left: 8px;
+}
+
+nb-window {
+  // Hide open & close button
+  .buttons {
+    display: none !important;
+  }
+  nb-card-header {
+    cursor: pointer;
+  }
+  nb-card-body {
+    padding: 0 !important;
+    nb-chat {
+      max-height: 80vh !important;
+      .header {
+        display: none;
+      }
+
+      nb-chat-message {
+        margin-bottom: .5rem !important;
+        p {
+          margin: 0 !important;
+        }
+      }
+    }
+  }
+}
